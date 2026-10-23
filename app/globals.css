@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+/* Christmas demo colors. Red is the action color. The deep green is for the
+   budget bar so a red Continue button still stands out on the green tree video. */
+:root {
+  --background: #0f5132;
+  --foreground: #ffffff;
+  --metro-blue: #01589d;
+  --metro-orange: #f59325;
+  --metro-red: #c8102e;
+  --metro-green: #0f5132;
+  --metro-gold: #ffe08a;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-metro-blue: var(--metro-blue);
+  --color-metro-orange: var(--metro-orange);
+  --color-metro-red: var(--metro-red);
+  --color-metro-green: var(--metro-green);
+  --color-metro-gold: var(--metro-gold);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+input,
+select,
+textarea {
+  color: #000000 !important;
+}
+
+input::placeholder {
+  color: #9ca3af !important;
+}
+
+/* Holiday loop fills the screen. The scrim keeps white type readable. */
+.holiday-bg {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: var(--metro-green);
+}
+
+.holiday-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.holiday-scrim {
+  position: absolute;
+  inset: 0;
+  /* Neutral darkening only, so the clip keeps its own color. */
+  background: rgba(0, 0, 0, 0.18);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .holiday-video {
+    display: none;
+  }
+}
