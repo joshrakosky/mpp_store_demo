@@ -1,7 +1,7 @@
 "use client";
 
-// Full-screen holiday loop behind every page. Muted so the browser can autoplay it.
-// A light tint keeps white headings readable over the bright snow.
+// Full-screen loop behind every page. Muted so the browser can autoplay it.
+// A light tint keeps white headings readable over the footage.
 
 export default function HolidayBackground() {
   return (
@@ -12,7 +12,7 @@ export default function HolidayBackground() {
         muted
         loop
         playsInline
-        src="/videos/holiday-background.mp4"
+        src="/videos/mpp-demo-background.mp4"
       />
       <div className="holiday-scrim" />
     </div>
