@@ -1,6 +1,7 @@
 // Demo walkthrough state. Stays in the browser. Nothing is sent to a server.
+// Cart keys are variant ids (see resolveCartLine), not just the eight product ids.
 
-import { getProduct } from "@/lib/products";
+import { resolveCartLine } from "@/lib/products";
 
 const NAME_KEY = "shopperName";
 const CART_KEY = "cart";
@@ -24,10 +25,11 @@ export function getCart(): Cart {
     const parsed = JSON.parse(raw) as unknown;
     if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return {};
     const cart: Cart = {};
-    for (const [id, qty] of Object.entries(parsed)) {
+    for (const [key, qty] of Object.entries(parsed)) {
       const count = Number(qty);
-      if (getProduct(id) && Number.isInteger(count) && count > 0) {
-        cart[id] = count;
+      // Drop stale keys from the old one-card-per-color catalog.
+      if (resolveCartLine(key) && Number.isInteger(count) && count > 0) {
+        cart[key] = count;
       }
     }
     return cart;
@@ -62,11 +64,4 @@ export function clearSession(): void {
 
 export function cartItemCount(cart: Cart): number {
   return Object.values(cart).reduce((sum, qty) => sum + qty, 0);
-}
-
-export function cartTotal(cart: Cart): number {
-  return Object.entries(cart).reduce((sum, [id, qty]) => {
-    const product = getProduct(id);
-    return sum + (product ? product.price * qty : 0);
-  }, 0);
 }

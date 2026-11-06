@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import CatalogImage from "@/components/CatalogImage";
-import { BUDGET, formatPrice, getProduct } from "@/lib/products";
+import { resolveCartLine } from "@/lib/products";
 import { formatCityLine, LOCKED_SHIPPING } from "@/lib/shipping";
-import { cartItemCount, cartTotal, createConfirmationCode, setConfirmationCode } from "@/lib/session";
+import { cartItemCount, createConfirmationCode, setConfirmationCode } from "@/lib/session";
 import { useShopper } from "@/lib/use-shopper";
 
 export default function ReviewPage() {
@@ -28,14 +28,13 @@ export default function ReviewPage() {
     );
   }
 
-  const spent = cartTotal(cart);
   const lines = Object.entries(cart)
-    .map(([id, qty]) => {
-      const product = getProduct(id);
-      if (!product) return null;
-      return { product, qty };
+    .map(([key, qty]) => {
+      const line = resolveCartLine(key);
+      if (!line) return null;
+      return { line, qty };
     })
-    .filter((line): line is NonNullable<typeof line> => line !== null);
+    .filter((entry): entry is NonNullable<typeof entry> => entry !== null);
 
   const handleSubmit = () => {
     // Demo only. The code stays in this browser tab.
@@ -52,29 +51,18 @@ export default function ReviewPage() {
           <h1 className="mb-6 text-2xl font-bold text-gray-900">Review your order</h1>
 
           <ul className="divide-y divide-gray-200 border-y border-gray-200">
-            {lines.map(({ product, qty }) => (
-              <li key={product.id} className="flex items-center gap-4 py-4">
-                <div className="h-16 w-12 shrink-0 overflow-hidden rounded bg-gray-100">
-                  <CatalogImage src={product.imageUrl} alt="" className="h-full w-full object-cover" />
+            {lines.map(({ line, qty }) => (
+              <li key={line.key} className="flex items-center gap-4 py-4">
+                <div className="h-16 w-16 shrink-0 overflow-hidden rounded bg-gray-100">
+                  <CatalogImage src={line.imageUrl} alt="" className="h-full w-full object-contain" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="font-medium text-gray-900">{product.name}</p>
-                  <p className="text-sm text-gray-600">
-                    {qty} × {formatPrice(product.price)}
-                  </p>
+                  <p className="font-medium text-gray-900">{line.name}</p>
+                  <p className="text-sm text-gray-600">Qty {qty}</p>
                 </div>
-                <p className="font-semibold text-gray-900">{formatPrice(product.price * qty)}</p>
               </li>
             ))}
           </ul>
-
-          <div className="mt-4 flex items-center justify-between text-gray-800">
-            <span>Total</span>
-            <span className="text-xl font-bold text-metro-red">{formatPrice(spent)}</span>
-          </div>
-          <p className="mt-1 text-right text-sm text-gray-600">
-            {formatPrice(BUDGET - spent)} left of {formatPrice(BUDGET)}
-          </p>
 
           <div className="mt-6 rounded-md bg-gray-50 p-4 text-gray-800">
             <p className="mb-1 text-sm font-medium text-gray-500">Ships to</p>
