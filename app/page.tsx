@@ -19,7 +19,8 @@ export default function LandingPage() {
       return;
     }
     setShopperName(trimmed);
-    router.push("/products");
+    // Info pitch first, then the gift grid.
+    router.push("/info");
   };
 
   return (

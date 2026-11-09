@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import CartMenu from "@/components/CartMenu";
 import ProductCard from "@/components/ProductCard";
 import ProductSelectModal from "@/components/ProductSelectModal";
 import { type DemoProduct, PRODUCTS } from "@/lib/products";
@@ -23,6 +24,16 @@ export default function ProductsPage() {
 
   const count = cartItemCount(cart);
 
+  const setQty = (cartKey: string, qty: number) => {
+    const next = { ...cart };
+    if (qty <= 0) {
+      delete next[cartKey];
+    } else {
+      next[cartKey] = qty;
+    }
+    updateCart(next);
+  };
+
   const addFromModal = (cartKey: string, qty: number) => {
     const next = { ...cart };
     next[cartKey] = (next[cartKey] ?? 0) + qty;
@@ -31,11 +42,30 @@ export default function ProductsPage() {
   };
 
   return (
-    <div className="min-h-screen px-4 py-8 pb-32">
+    <div className="min-h-screen px-4 py-8">
       <div className="mx-auto max-w-6xl">
-        <div className="mb-8 text-center">
+        <div className="mb-6 text-center">
           <h1 className="mb-2 text-3xl font-bold text-white md:text-4xl">Choose your gifts</h1>
           <p className="text-white/80">Select products to build your demo order.</p>
+        </div>
+
+        {/* Aligns with the first and last cards in the 4-column grid. */}
+        <div className="mb-3 flex items-center justify-between">
+          <button
+            type="button"
+            onClick={() => router.push("/info")}
+            aria-label="Back to info"
+            className="flex h-10 w-10 items-center justify-center rounded-md bg-metro-red text-white hover:opacity-90"
+          >
+            <BackIcon />
+          </button>
+
+          <CartMenu
+            cart={cart}
+            count={count}
+            onSetQty={setQty}
+            onContinue={() => router.push("/shipping")}
+          />
         </div>
 
         {/* Eight family cards. Color / size / qty open in the Select popup. */}
@@ -43,22 +73,6 @@ export default function ProductsPage() {
           {PRODUCTS.map((product) => (
             <ProductCard key={product.id} product={product} onSelect={setActiveProduct} />
           ))}
-        </div>
-      </div>
-
-      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-white/20 bg-metro-green/95 px-4 py-4 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-lg font-semibold text-white">
-            {count} {count === 1 ? "item" : "items"} in cart
-          </p>
-          <button
-            type="button"
-            disabled={count === 0}
-            onClick={() => router.push("/shipping")}
-            className="rounded-md bg-metro-red px-6 py-3 font-medium text-white hover:opacity-90 disabled:cursor-not-allowed disabled:bg-white/30"
-          >
-            Continue
-          </button>
         </div>
       </div>
 
@@ -70,5 +84,19 @@ export default function ProductsPage() {
         />
       )}
     </div>
+  );
+}
+
+function BackIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" aria-hidden>
+      <path
+        d="M15 6l-6 6 6 6"
+        stroke="currentColor"
+        strokeWidth="2.25"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }
